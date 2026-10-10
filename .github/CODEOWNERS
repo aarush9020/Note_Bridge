@@ -1,0 +1,39 @@
+# Replace the placeholder handles with real GitHub usernames (see docs/TEAM.md).
+# Later rules win. Shared contracts list both owners so both must approve.
+
+# Dev A: pipeline / backend
+/packages/core/src/ingest/        @DEV_A_GITHUB
+/packages/core/src/retrieve/      @DEV_A_GITHUB
+/packages/core/src/ground/        @DEV_A_GITHUB
+/packages/core/src/align/         @DEV_A_GITHUB
+/packages/core/src/providers/     @DEV_A_GITHUB
+/apps/server/src/db/repositories/ @DEV_A_GITHUB
+/apps/server/src/jobs/            @DEV_A_GITHUB
+/apps/server/src/routes/          @DEV_A_GITHUB
+/apps/server/src/sandbox/         @DEV_A_GITHUB
+/eval/                            @DEV_A_GITHUB
+/samples/                         @DEV_A_GITHUB
+/packages/features/verifier/      @DEV_A_GITHUB
+/packages/features/conflicts/     @DEV_A_GITHUB
+
+# Dev B: product / agent / UI
+/apps/web/                        @DEV_B_GITHUB
+/apps/server/src/agent/           @DEV_B_GITHUB
+/packages/features/study-agent/        @DEV_B_GITHUB
+/packages/features/problem-finder/     @DEV_B_GITHUB
+/packages/features/handwriting-repair/ @DEV_B_GITHUB
+/packages/features/prerequisites/      @DEV_B_GITHUB
+/packages/features/semester-tracker/   @DEV_B_GITHUB
+/packages/features/mistake-diagnosis/  @DEV_B_GITHUB
+
+# Shared contracts: both approve
+/packages/core/src/types.ts           @DEV_A_GITHUB @DEV_B_GITHUB
+/packages/core/src/plugin.ts          @DEV_A_GITHUB @DEV_B_GITHUB
+/packages/core/src/vector.ts          @DEV_A_GITHUB @DEV_B_GITHUB
+/packages/core/src/config-schema.ts   @DEV_A_GITHUB @DEV_B_GITHUB
+/apps/server/src/db/migrations/       @DEV_A_GITHUB @DEV_B_GITHUB
+/apps/server/src/plugins/loader.ts    @DEV_A_GITHUB @DEV_B_GITHUB
+/docs/API.md                          @DEV_A_GITHUB @DEV_B_GITHUB
+/.github/                             @DEV_A_GITHUB @DEV_B_GITHUB
+/package.json                         @DEV_A_GITHUB @DEV_B_GITHUB
+/pnpm-workspace.yaml                  @DEV_A_GITHUB @DEV_B_GITHUB

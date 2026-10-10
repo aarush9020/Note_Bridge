@@ -1,0 +1,45 @@
+import { useEffect, useState } from 'react';
+import { Link, Route, Routes } from 'react-router-dom';
+import { PanelSlot } from './features/PanelSlot';
+import { getHealth, type Health } from './lib/api';
+
+function Home() {
+  const [health, setHealth] = useState<Health | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getHealth()
+      .then(setHealth)
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)));
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Gyan Setu</h1>
+      <p className="text-slate-600">Bridge your professor's slides and your textbook.</p>
+      {error && <p className="text-red-600">Server unreachable: {error}</p>}
+      {!health && !error && <p className="text-slate-500">Connecting to server…</p>}
+      {health && (
+        <p className="text-green-700">
+          Server OK — LLM: {health.llmProvider}, embeddings: {health.embeddingsProvider}
+        </p>
+      )}
+      <PanelSlot slot="global" />
+    </div>
+  );
+}
+
+export function App() {
+  return (
+    <div className="mx-auto max-w-5xl p-6">
+      <nav className="mb-6 flex gap-4 border-b border-slate-200 pb-3">
+        <Link to="/" className="font-medium text-blue-700">
+          Home
+        </Link>
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
+    </div>
+  );
+}

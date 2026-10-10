@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+
+# secrets - never commit
+.env
+.env.*
+!.env.example
+
+# build output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# local data
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.model-cache/
+.cache/
+uploads/
+
+# editor / OS
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.log
