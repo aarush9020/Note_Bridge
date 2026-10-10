@@ -20,9 +20,18 @@ export interface LLMResponse {
   usage: Usage;
 }
 
+export interface VisionRequest {
+  image: Uint8Array;
+  mimeType: 'image/png' | 'image/jpeg';
+  prompt: string;
+  maxTokens?: number;
+}
+
 export interface LLMProvider {
   readonly id: string;
   complete(req: LLMRequest): Promise<LLMResponse>;
+  /** Read text/structure from an image. Optional: providers without vision omit it. */
+  vision?(req: VisionRequest): Promise<LLMResponse>;
 }
 
 export interface EmbeddingProvider {

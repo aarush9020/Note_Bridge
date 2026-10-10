@@ -1,4 +1,51 @@
-# Contract requests (from Laptop B — Experience)
+# Contract requests
+
+Use this file when you need a change in a file the other laptop owns (see `docs/TEAM.md`).
+Add a new entry at the top. The owner replies in the entry and moves it to "Done" when applied.
+
+Entry format:
+
+```
+### <short title> (from Laptop A|B, YYYY-MM-DD)
+- File(s): <path>
+- Change wanted: <what and why>
+- Status: open | done | declined (<reason>)
+```
+
+## Open
+
+### Confirm owners of upload and job routes, `samples/`, server wiring (from Laptop A, 2026-10-10)
+
+- File(s): `apps/server/src/routes/*` (upload, job events), `samples/**`, `apps/server/src/{app,index,config,seed}.ts`
+- Change wanted: the ownership list does not name these. Laptop A is treating them as Engine
+  (provisional, see `docs/TEAM.md`). Laptop B: reply here if you disagree.
+- Status: open
+
+### `docs/BRIEF.md` is still a placeholder (from Laptop A, 2026-10-10)
+
+- File(s): `docs/BRIEF.md`
+- Change wanted: the full brief has not been saved yet, so Phase 1a was built from the plan in
+  conversation rather than from Section 7. Paste the brief so it can be checked against the code.
+- Status: open
+
+### FYI for Laptop B: Phase 1a changes to shared files (from Laptop A, 2026-10-10)
+
+- `packages/core/src/providers/llm.ts`: `LLMProvider` gained an optional `vision()` method (used for
+  scanned pages and handwritten notes). `MockProvider` implements it. No existing caller breaks.
+- `apps/server/src/db/migrations/002_ingest.sql`: new columns on `documents` (status, warnings,
+  page_quality, ...), `sections`/`chunks` (ordinal, exception) and `jobs` (document_id, error).
+  `types.ts` was NOT changed, so these are not on the shared types yet. If the UI needs
+  `warnings` or per-page quality, ask here and Laptop A will add them to `types.ts` and the API.
+- Root files: `pnpm-lock.yaml` changed (new dependencies `pdfjs-dist`, `pdf-lib`,
+  `@fastify/multipart`). Run `pnpm install` after pulling.
+- New routes: see "Implemented (Phase 1a)" in `docs/API.md`.
+- Status: open (read and reply when seen)
+
+## Done
+
+_(none yet)_
+
+## Contract requests (from Laptop B — Experience)
 
 Change requests for the **shared** contract. Per `docs/TEAM.md`, Dev B does **not** edit core / db /
 eval or the contract files (`packages/core/src/types.ts`, `docs/API.md`). Anything the Phase 1b
@@ -6,7 +53,7 @@ screens need from the shared surface is filed here for the contract owner instea
 
 Owner: Dev A (contract). Status: **open**. Raised during Phase 1b (screens).
 
-## 1. `Coverage` type + `/coverage` response shape
+### 1. `Coverage` type + `/coverage` response shape
 
 **Why:** `docs/API.md` lists `GET /api/courses/:id/coverage` but its response is explicitly
 "TBD in Phase 1b" (API.md line 27). The Coverage screen needs a stable shape.
@@ -36,7 +83,7 @@ Questions for the owner:
   `proposed` ones with non-null `bookSectionId`?
 - Are `professorOnly` / `bookOnly` **sections** (current assumption) or ids?
 
-## 2. `PUT /api/edges/:id` request body
+### 2. `PUT /api/edges/:id` request body
 
 **Why:** The Alignment Map confirms / rejects / remaps an edge. Please confirm the body.
 
@@ -54,13 +101,13 @@ Questions:
 - Does `remapped` require `bookSectionId` (server should 422 otherwise)? Confirmed?
 - Does `confirmed`/`rejected` ignore `bookSectionId` if sent?
 
-## 3. `GET /api/courses/:id/sections` shape
+### 3. `GET /api/courses/:id/sections` shape
 
 **Assumption:** returns a **flat `Section[]`** where each item carries `documentId` + `parentId`
 (the viewer builds the tree client-side via `parentId`). Please confirm it is flat and not
 pre-nested. If nesting is planned, tell me the node shape and I will drop `buildSectionTree`.
 
-## 4. `Section` has no `role` (used to classify book vs professor units)
+### 4. `Section` has no `role` (used to classify book vs professor units)
 
 **Observation:** `Section` carries `documentId` but not the document `role`, so the client must
 join sections → documents to tell book sections from professor units (done in
@@ -68,14 +115,20 @@ join sections → documents to tell book sections from professor units (done in
 denormalized `role` on `Section` (or including `role` in the `/sections` payload) would save a
 second round-trip. Non-blocking.
 
-## Notes
+### Notes
 
 - Screens build against `packages/core/src/types.ts` (the shared contract; `api-contract.ts` is not
   present in this repo) and mock fixtures shaped to match it, because the REST endpoints and seed
   data are Dev A's Phase 1b/1c work. Toggling `VITE_USE_MOCK_API=false` switches the client to the
   real endpoints with no code change.
 
-## Laptop B confirmation: ownership in TEAM.md
+### Laptop B confirmation: ownership in TEAM.md
+
+> Note: this section was written against the earlier Dev A / Dev B ownership table. `docs/TEAM.md`
+> has since been replaced by the Laptop A / Laptop B version. In it, `sandbox/`, `verifier/` and
+> `conflicts/` belong to Laptop B, and `problem-finder` and `handwriting-repair` belong to Laptop A
+> (the reverse of the table below for those features). That version of `docs/TEAM.md` and
+> `.github/CODEOWNERS` is the current source of truth; Laptop B has not yet re-confirmed it.
 
 Status: **accepted, with the small additions below.** Raised by Laptop B (Dev B, Experience).
 

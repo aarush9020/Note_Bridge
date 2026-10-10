@@ -1,10 +1,11 @@
 # Verifier and code sandbox (Phase 3)
 
-Status: implemented with a **mock script writer**. Written on Laptop B; the paths
-`apps/server/src/sandbox/` and `packages/features/verifier/` are Dev A's in `docs/TEAM.md`, so Dev A
-must review the PR. `docs/BRIEF.md` was still a placeholder when this was built, so Section 10-B
-could not be checked. The result shape below is an **assumption** and is proposed for the shared
-contract (Dev A to confirm or amend).
+Status: implemented with a **mock script writer**. Written on Laptop B. In the current
+`docs/TEAM.md` and `.github/CODEOWNERS`, `apps/server/src/sandbox/` and
+`packages/features/verifier/` belong to Laptop B. (`docs/ROADMAP.md` still lists Phase 3 under owner
+A; that row has not been reconciled.) `docs/BRIEF.md` was still a placeholder when this was built,
+so Section 10-B could not be checked. The result shape below is an **assumption** and is proposed
+for the shared contract (Laptop A to confirm or amend).
 
 ## Sandbox (`apps/server/src/sandbox/`)
 

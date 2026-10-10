@@ -5,3 +5,4 @@ export * from './plugin';
 export * from './providers';
 export * from './retrieve';
 export * from './ground';
+export * from './ingest';

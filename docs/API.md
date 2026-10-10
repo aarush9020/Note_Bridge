@@ -28,6 +28,19 @@ implemented yet; Dev B can mock them in the web app until they land.
 | GET    | `/api/jobs/:id/events`       | **SSE** progress stream                           | events below                 |
 | POST   | `/api/courses/:id/chat`      | **SSE** study-agent stream                        | events below                 |
 
+## Implemented (Phase 1a, ingestion)
+
+| Method | Path                               | Notes                                                                                                                                                                       |
+| ------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/api/courses/:courseId/documents` | multipart: `role` (book/slides/notes), optional `title`, `file`. 202 `{ documentId, jobId, cached }`. Same bytes in the same course return `cached: true` and skip all work |
+| GET    | `/api/courses/:courseId/documents` | `Document[]`                                                                                                                                                                |
+| GET    | `/api/jobs/:jobId`                 | `{ jobId, kind, status, progress, message, documentId, error }`                                                                                                             |
+| GET    | `/api/jobs/:jobId/events`          | SSE. Each `data:` line is a JSON `JobProgress`. The stream ends after `done` or `failed`; a late client gets the final state                                                |
+
+Errors: `{ "error": { "code", "message" } }`. Codes so far: `course_not_found`, `job_not_found`,
+`no_file`, `bad_role`, `bad_upload`, `file_too_large`. There is no "create course" route yet, so a
+course must exist in the database first (`pnpm seed` will create one in Phase 1c).
+
 ## SSE events
 
 Progress stream (`/api/jobs/:id/events`): each message is a JSON `JobProgress`.
