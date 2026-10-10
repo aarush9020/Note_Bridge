@@ -8,6 +8,7 @@ import {
   type Config,
   type PluginContext,
 } from '@gyan/core';
+import { createAgent, createChunkSource, registerChatRoutes, type Agent } from './agent';
 import { openDb, type Db } from './db';
 import { DocumentRepository } from './db/repositories/documents';
 import { IngestStore } from './db/repositories/ingest-store';
@@ -41,9 +42,11 @@ export interface BuiltApp {
 export interface BuildOptions {
   config: Config;
   importer?: PluginImporter;
+  /** Defaults to the deterministic MockAgent. Tests inject their own. */
+  agent?: Agent;
 }
 
-export async function buildApp({ config, importer }: BuildOptions): Promise<BuiltApp> {
+export async function buildApp({ config, importer, agent }: BuildOptions): Promise<BuiltApp> {
   const app = Fastify({ logger: false });
   await app.register(cors, { origin: true });
 
@@ -79,6 +82,14 @@ export async function buildApp({ config, importer }: BuildOptions): Promise<Buil
     ingest: { documents, store, runner, llm: ctx.llm, embeddings: ctx.embeddings },
     bus,
     jobs,
+  });
+
+  // Study chat (Laptop B): POST /api/courses/:courseId/chat, an SSE stream.
+  await registerChatRoutes(app, {
+    agent: agent ?? createAgent(config, ctx.log),
+    source: createChunkSource(db),
+    maxToolCalls: config.MAX_TOOL_CALLS,
+    log: ctx.log,
   });
 
   app.get('/api/health', async () => ({
