@@ -10,6 +10,19 @@ import {
 } from '@gyan/core';
 import { openDb, type Db } from './db';
 import { loadPlugins, type LoadedPlugin, type PluginImporter } from './plugins/loader';
+import { createSandbox, type Sandbox } from './sandbox';
+
+/** A plugin that wants to run code exposes attachSandbox; the server hands it the sandbox. */
+function withSandbox(importer: PluginImporter, sandbox: Sandbox): PluginImporter {
+  return async (specifier) => {
+    const mod = (await importer(specifier)) as Record<string, unknown>;
+    for (const candidate of [mod.default, mod.plugin]) {
+      const attach = (candidate as { attachSandbox?: unknown } | undefined)?.attachSandbox;
+      if (typeof attach === 'function') attach.call(candidate, sandbox.run);
+    }
+    return mod;
+  };
+}
 
 export interface BuiltApp {
   app: FastifyInstance;
@@ -39,7 +52,13 @@ export async function buildApp({ config, importer }: BuildOptions): Promise<Buil
     log: (message, extra) => console.log(`[gyan] ${message}`, extra ? JSON.stringify(extra) : ''),
   };
 
-  const plugins = await loadPlugins(app, ctx, config.plugins, importer);
+  const sandbox = createSandbox({ mode: config.SANDBOX_MODE, log: ctx.log });
+  const plugins = await loadPlugins(
+    app,
+    ctx,
+    config.plugins,
+    withSandbox(importer ?? ((s) => import(s)), sandbox),
+  );
 
   app.get('/api/health', async () => ({
     ok: true,
