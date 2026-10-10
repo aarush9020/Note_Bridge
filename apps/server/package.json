@@ -12,6 +12,7 @@
   "dependencies": {
     "@fastify/cors": "^11.0.0",
     "@gyan/core": "workspace:*",
+    "@gyan/feature-verifier": "workspace:*",
     "better-sqlite3": "^13.0.3",
     "dotenv": "^17.0.0",
     "fastify": "^5.0.0"
