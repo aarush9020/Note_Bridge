@@ -1,39 +1,34 @@
-# Replace the placeholder handles with real GitHub usernames (see docs/TEAM.md).
-# Later rules win. Shared contracts list both owners so both must approve.
+# See docs/TEAM.md. Laptop A (Engine) = @aathishprao11-cmyk.
+# Laptop B (Experience) = @LAPTOP_B_GITHUB: replace with the real GitHub username.
+# Later rules win, so shared files are listed last with both owners.
 
-# Dev A: pipeline / backend
-/packages/core/src/ingest/        @DEV_A_GITHUB
-/packages/core/src/retrieve/      @DEV_A_GITHUB
-/packages/core/src/ground/        @DEV_A_GITHUB
-/packages/core/src/align/         @DEV_A_GITHUB
-/packages/core/src/providers/     @DEV_A_GITHUB
-/apps/server/src/db/repositories/ @DEV_A_GITHUB
-/apps/server/src/jobs/            @DEV_A_GITHUB
-/apps/server/src/routes/          @DEV_A_GITHUB
-/apps/server/src/sandbox/         @DEV_A_GITHUB
-/eval/                            @DEV_A_GITHUB
-/samples/                         @DEV_A_GITHUB
-/packages/features/verifier/      @DEV_A_GITHUB
-/packages/features/conflicts/     @DEV_A_GITHUB
+# Laptop A (Engine)
+/packages/core/                              @aathishprao11-cmyk
+/eval/                                       @aathishprao11-cmyk
+/samples/                                    @aathishprao11-cmyk
+/apps/server/src/db/                         @aathishprao11-cmyk
+/apps/server/src/jobs/                       @aathishprao11-cmyk
+/apps/server/src/routes/                     @aathishprao11-cmyk
+/packages/features/problem-finder/           @aathishprao11-cmyk
+/packages/features/handwriting-repair/       @aathishprao11-cmyk
 
-# Dev B: product / agent / UI
-/apps/web/                        @DEV_B_GITHUB
-/apps/server/src/agent/           @DEV_B_GITHUB
-/packages/features/study-agent/        @DEV_B_GITHUB
-/packages/features/problem-finder/     @DEV_B_GITHUB
-/packages/features/handwriting-repair/ @DEV_B_GITHUB
-/packages/features/prerequisites/      @DEV_B_GITHUB
-/packages/features/semester-tracker/   @DEV_B_GITHUB
-/packages/features/mistake-diagnosis/  @DEV_B_GITHUB
+# Laptop B (Experience)
+/apps/web/                                   @LAPTOP_B_GITHUB
+/apps/server/src/agent/                      @LAPTOP_B_GITHUB
+/apps/server/src/sandbox/                    @LAPTOP_B_GITHUB
+/packages/features/study-agent/              @LAPTOP_B_GITHUB
+/packages/features/verifier/                 @LAPTOP_B_GITHUB
+/packages/features/conflicts/                @LAPTOP_B_GITHUB
+/packages/features/prerequisites/            @LAPTOP_B_GITHUB
+/packages/features/semester-tracker/         @LAPTOP_B_GITHUB
+/packages/features/mistake-diagnosis/        @LAPTOP_B_GITHUB
 
-# Shared contracts: both approve
-/packages/core/src/types.ts           @DEV_A_GITHUB @DEV_B_GITHUB
-/packages/core/src/plugin.ts          @DEV_A_GITHUB @DEV_B_GITHUB
-/packages/core/src/vector.ts          @DEV_A_GITHUB @DEV_B_GITHUB
-/packages/core/src/config-schema.ts   @DEV_A_GITHUB @DEV_B_GITHUB
-/apps/server/src/db/migrations/       @DEV_A_GITHUB @DEV_B_GITHUB
-/apps/server/src/plugins/loader.ts    @DEV_A_GITHUB @DEV_B_GITHUB
-/docs/API.md                          @DEV_A_GITHUB @DEV_B_GITHUB
-/.github/                             @DEV_A_GITHUB @DEV_B_GITHUB
-/package.json                         @DEV_A_GITHUB @DEV_B_GITHUB
-/pnpm-workspace.yaml                  @DEV_A_GITHUB @DEV_B_GITHUB
+# Shared: both approve
+/package.json                                @aathishprao11-cmyk @LAPTOP_B_GITHUB
+/pnpm-lock.yaml                              @aathishprao11-cmyk @LAPTOP_B_GITHUB
+/pnpm-workspace.yaml                         @aathishprao11-cmyk @LAPTOP_B_GITHUB
+/tsconfig.base.json                          @aathishprao11-cmyk @LAPTOP_B_GITHUB
+/.env.example                                @aathishprao11-cmyk @LAPTOP_B_GITHUB
+/packages/core/src/api-contract.ts           @aathishprao11-cmyk @LAPTOP_B_GITHUB
+/packages/core/src/types.ts                  @aathishprao11-cmyk @LAPTOP_B_GITHUB
+/.github/                                    @aathishprao11-cmyk @LAPTOP_B_GITHUB
