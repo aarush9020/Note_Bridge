@@ -26,5 +26,7 @@ None yet. Any cut is recorded here with the date and reason.
 
 - Docker is not installed on the primary dev machine, so the sandbox runs as a local subprocess and
   network isolation is not enforced. A warning is logged at startup.
+- The Verifier (Phase 3) is built with a mock script writer; the Docker path is untested here. See
+  `docs/VERIFIER.md`.
 - Real LLM providers and local embeddings are not implemented yet (Phase 1a); asking for them fails
   loudly instead of silently using the mock.
