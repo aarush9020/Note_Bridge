@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import { PanelSlot } from './features/PanelSlot';
 import { getHealth, type Health } from './lib/api';
+import { Courses } from './routes/Courses';
+import { CourseLayout } from './routes/CourseLayout';
+import { Upload } from './routes/Upload';
+import { Viewer } from './routes/Viewer';
+import { AlignmentMap } from './routes/AlignmentMap';
+import { CoverageScreen } from './routes/Coverage';
 
 function Home() {
   const [health, setHealth] = useState<Health | null>(null);
@@ -24,6 +30,9 @@ function Home() {
           Server OK — LLM: {health.llmProvider}, embeddings: {health.embeddingsProvider}
         </p>
       )}
+      <Link to="/courses" className="inline-block font-medium text-blue-700">
+        Go to Courses →
+      </Link>
       <PanelSlot slot="global" />
     </div>
   );
@@ -36,9 +45,20 @@ export function App() {
         <Link to="/" className="font-medium text-blue-700">
           Home
         </Link>
+        <Link to="/courses" className="font-medium text-blue-700">
+          Courses
+        </Link>
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/courses/:courseId" element={<CourseLayout />}>
+          <Route index element={<Upload />} />
+          <Route path="documents" element={<Upload />} />
+          <Route path="viewer" element={<Viewer />} />
+          <Route path="align" element={<AlignmentMap />} />
+          <Route path="coverage" element={<CoverageScreen />} />
+        </Route>
       </Routes>
     </div>
   );

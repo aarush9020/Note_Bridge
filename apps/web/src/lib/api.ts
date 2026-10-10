@@ -1,3 +1,32 @@
+/**
+ * Typed client for the Phase 1b REST + SSE API (docs/API.md). Types come from `@gyan/core`.
+ *
+ * Endpoints are still Dev A's Phase 1b work, so each call falls back to contract-shaped fixtures
+ * when `VITE_USE_MOCK_API` is not `false` (the default). Set `VITE_USE_MOCK_API=false` in `.env`
+ * once the real server is up — no code change needed. See docs/API.md and docs/CONTRACT_REQUESTS.md.
+ */
+import type {
+  Course,
+  Document,
+  Section,
+  Edge,
+  EdgeStatus,
+  SourceRole,
+  JobProgress,
+  Coverage,
+} from './types';
+import {
+  mockCourse,
+  mockCourses,
+  mockDocuments,
+  mockSections,
+  mockEdges,
+  mockJobProgress,
+} from './mockData';
+import { computeCoverage } from './format';
+
+const useMock = import.meta.env.VITE_USE_MOCK_API !== 'false';
+
 export interface Health {
   ok: boolean;
   llmProvider: string;
@@ -9,4 +38,198 @@ export async function getHealth(): Promise<Health> {
   const res = await fetch('/api/health');
   if (!res.ok) throw new Error(`Health check failed: HTTP ${res.status}`);
   return (await res.json()) as Health;
+}
+
+/** Matches the error shape in docs/API.md: { error: { code, message } }. */
+export class ApiError extends Error {
+  readonly status: number;
+  readonly code: string;
+  constructor(status: number, code: string, message: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.code = code;
+  }
+}
+
+function toApiError(status: number, body: unknown): ApiError {
+  const err = (body as { error?: { code?: string; message?: string } } | null)?.error;
+  return new ApiError(status, err?.code ?? 'http_error', err?.message ?? `HTTP ${status}`);
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(path, {
+    headers: { 'content-type': 'application/json' },
+    ...init,
+  });
+  if (!res.ok) {
+    let body: unknown;
+    try {
+      body = await res.json();
+    } catch {
+      body = null;
+    }
+    throw toApiError(res.status, body);
+  }
+  return (await res.json()) as T;
+}
+
+export async function listCourses(): Promise<Course[]> {
+  if (useMock) return mockCourses;
+  return request<Course[]>('/api/courses');
+}
+
+export async function createCourse(name: string): Promise<Course> {
+  if (useMock) {
+    return { ...mockCourse, id: `course-${Date.now()}`, name, createdAt: new Date().toISOString() };
+  }
+  return request<Course>('/api/courses', { method: 'POST', body: JSON.stringify({ name }) });
+}
+
+export async function listDocuments(courseId: string): Promise<Document[]> {
+  if (useMock) return mockDocuments.filter((d) => d.courseId === courseId);
+  return request<Document[]>(`/api/courses/${encodeURIComponent(courseId)}/documents`);
+}
+
+export interface UploadResult {
+  document: Document;
+  jobId: string;
+}
+
+export async function uploadDocument(
+  courseId: string,
+  file: File,
+  role: SourceRole,
+): Promise<UploadResult> {
+  if (useMock) {
+    return {
+      document: {
+        id: `doc-${Date.now()}`,
+        courseId,
+        role,
+        title: file.name,
+        contentHash: 'pending',
+        pageCount: 0,
+        pageOffset: 0,
+        createdAt: new Date().toISOString(),
+      },
+      jobId: `job-${Date.now()}`,
+    };
+  }
+  const form = new FormData();
+  form.append('file', file);
+  form.append('role', role);
+  // No JSON content-type: the browser sets multipart boundaries.
+  const res = await fetch(`/api/courses/${encodeURIComponent(courseId)}/documents`, {
+    method: 'POST',
+    body: form,
+  });
+  if (!res.ok) {
+    let body: unknown;
+    try {
+      body = await res.json();
+    } catch {
+      body = null;
+    }
+    throw toApiError(res.status, body);
+  }
+  return (await res.json()) as UploadResult;
+}
+
+export async function listSections(courseId: string): Promise<Section[]> {
+  if (useMock) {
+    const docIds = new Set(mockDocuments.filter((d) => d.courseId === courseId).map((d) => d.id));
+    return mockSections.filter((s) => docIds.has(s.documentId));
+  }
+  return request<Section[]>(`/api/courses/${encodeURIComponent(courseId)}/sections`);
+}
+
+export async function startAlign(courseId: string): Promise<{ jobId: string }> {
+  if (useMock) return { jobId: `job-align-${Date.now()}` };
+  return request<{ jobId: string }>(`/api/courses/${encodeURIComponent(courseId)}/align`, {
+    method: 'POST',
+  });
+}
+
+export async function listEdges(courseId: string): Promise<Edge[]> {
+  if (useMock) return mockEdges.filter((e) => e.courseId === courseId);
+  return request<Edge[]>(`/api/courses/${encodeURIComponent(courseId)}/edges`);
+}
+
+export interface UpdateEdgeBody {
+  status: EdgeStatus;
+  bookSectionId?: string;
+}
+
+export async function updateEdge(edgeId: string, body: UpdateEdgeBody): Promise<Edge> {
+  if (useMock) {
+    const edge = mockEdges.find((e) => e.id === edgeId);
+    if (!edge) throw new ApiError(404, 'not_found', `Edge ${edgeId} not found`);
+    return { ...edge, ...body };
+  }
+  return request<Edge>(`/api/edges/${encodeURIComponent(edgeId)}`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+}
+
+/**
+ * Coverage. The `/coverage` response is "TBD in Phase 1b" (docs/API.md), so the client derives it
+ * from edges+sections+documents until the contract lands (see docs/CONTRACT_REQUESTS.md).
+ */
+export async function getCoverage(courseId: string): Promise<Coverage> {
+  const [edges, sections, documents] = await Promise.all([
+    listEdges(courseId),
+    listSections(courseId),
+    listDocuments(courseId),
+  ]);
+  return computeCoverage(courseId, edges, sections, documents);
+}
+
+export interface JobProgressHandlers {
+  onProgress: (p: JobProgress) => void;
+  onError?: (e: Error) => void;
+  onDone?: () => void;
+}
+
+/**
+ * Subscribe to the SSE progress stream (docs/API.md: GET /api/jobs/:id/events). In mock mode it
+ * replays a deterministic progress sequence. Returns an unsubscribe function.
+ */
+export function subscribeJobProgress(
+  jobId: string,
+  kind: 'ingest' | 'align',
+  handlers: JobProgressHandlers,
+): () => void {
+  if (useMock) {
+    const frames = mockJobProgress(jobId, kind);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    frames.forEach((frame, i) => {
+      timers.push(
+        setTimeout(
+          () => {
+            handlers.onProgress(frame);
+            if (i === frames.length - 1) handlers.onDone?.();
+          },
+          250 * (i + 1),
+        ),
+      );
+    });
+    return () => timers.forEach(clearTimeout);
+  }
+
+  const source = new EventSource(`/api/jobs/${encodeURIComponent(jobId)}/events`);
+  source.onmessage = (event: MessageEvent<string>) => {
+    try {
+      handlers.onProgress(JSON.parse(event.data) as JobProgress);
+    } catch (err) {
+      handlers.onError?.(err instanceof Error ? err : new Error(String(err)));
+    }
+  };
+  source.onerror = () => {
+    handlers.onError?.(new ApiError(0, 'sse_error', 'Progress stream disconnected'));
+    source.close();
+    handlers.onDone?.();
+  };
+  return () => source.close();
 }

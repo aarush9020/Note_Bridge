@@ -1,0 +1,295 @@
+/**
+ * Contract-shaped fixtures used while the real REST endpoints and seed data are still Dev A's
+ * Phase 1b/1c work (docs/API.md: "Dev B can mock them in the web app until they land").
+ *
+ * Every object matches a type in `@gyan/core` exactly. The subject mirrors the planned synthetic
+ * intro-physics sample (docs/ROADMAP.md Phase 1c) so the swap to real data is 1:1. No core,
+ * db or eval files are touched; this lives entirely in apps/web.
+ */
+import type { Course, Document, Section, Chunk, Edge, JobProgress, JobKind } from './types';
+
+export const COURSE_ID = 'course-phys101';
+
+const createdAt = '2026-01-05T09:00:00.000Z';
+
+export const mockCourse: Course = {
+  id: COURSE_ID,
+  name: 'Intro Physics 101',
+  createdAt,
+};
+
+export const mockCourses: Course[] = [mockCourse];
+
+export const mockDocuments: Document[] = [
+  {
+    id: 'doc-book',
+    courseId: COURSE_ID,
+    role: 'book',
+    title: 'University Physics — Ch. 2 (Kinematics)',
+    contentHash: 'book0000000000000000000000000000',
+    pageCount: 24,
+    pageOffset: 0,
+    createdAt,
+  },
+  {
+    id: 'doc-slides',
+    courseId: COURSE_ID,
+    role: 'slides',
+    title: 'Week 3 — Kinematics slides',
+    contentHash: 'slide0000000000000000000000000000',
+    pageCount: 10,
+    // slides skip the cover + 2 front-matter pages before "printed" page 1
+    pageOffset: 2,
+    createdAt,
+  },
+  {
+    id: 'doc-notes',
+    courseId: COURSE_ID,
+    role: 'notes',
+    title: 'Lecture notes — motion',
+    contentHash: 'notes0000000000000000000000000000',
+    pageCount: 4,
+    pageOffset: 0,
+    createdAt,
+  },
+];
+
+// Flat sections keyed by parentId (matches the planned GET /sections shape).
+export const mockSections: Section[] = [
+  // Book sections
+  {
+    id: 'book-1',
+    documentId: 'doc-book',
+    parentId: null,
+    title: '2.1 Displacement',
+    level: 1,
+    pageStart: 12,
+    pageEnd: 15,
+    summary: 'Vectors for position and displacement.',
+  },
+  {
+    id: 'book-1-1',
+    documentId: 'doc-book',
+    parentId: 'book-1',
+    title: '2.1.2 Average velocity',
+    level: 2,
+    pageStart: 13,
+    pageEnd: 13,
+    summary: 'Displacement over elapsed time.',
+  },
+  {
+    id: 'book-2',
+    documentId: 'doc-book',
+    parentId: null,
+    title: '2.3 Acceleration',
+    level: 1,
+    pageStart: 18,
+    pageEnd: 21,
+    summary: 'Rate of change of velocity.',
+  },
+  {
+    id: 'book-3',
+    documentId: 'doc-book',
+    parentId: null,
+    title: '2.5 Free fall',
+    level: 1,
+    pageStart: 24,
+    pageEnd: 26,
+    summary: 'Motion under gravity, g = 9.8 m/s^2.',
+  },
+
+  // Slides sections (professor units)
+  {
+    id: 'slides-1',
+    documentId: 'doc-slides',
+    parentId: null,
+    title: 'Kinematics overview',
+    level: 1,
+    pageStart: 3,
+    pageEnd: 3,
+    summary: 'Position, velocity, acceleration.',
+  },
+  {
+    id: 'slides-1-1',
+    documentId: 'doc-slides',
+    parentId: 'slides-1',
+    title: 'Average vs instantaneous velocity',
+    level: 2,
+    pageStart: 4,
+    pageEnd: 4,
+    summary: 'Two ways to talk about velocity.',
+  },
+  {
+    id: 'slides-2',
+    documentId: 'doc-slides',
+    parentId: null,
+    title: 'Acceleration and free fall',
+    level: 1,
+    pageStart: 6,
+    pageEnd: 6,
+    summary: 'Combines a = dv/dt with g.',
+  },
+  {
+    id: 'slides-3',
+    documentId: 'doc-slides',
+    parentId: null,
+    title: 'Sign conventions (our course)',
+    level: 1,
+    pageStart: 9,
+    pageEnd: 9,
+    summary: 'We take upward as positive.',
+  },
+
+  // Notes sections (professor units)
+  {
+    id: 'notes-1',
+    documentId: 'doc-notes',
+    parentId: null,
+    title: 'Worked example — dropped ball',
+    level: 1,
+    pageStart: 1,
+    pageEnd: 2,
+    summary: 'A ball dropped from a height.',
+  },
+];
+
+export const mockChunks: Chunk[] = [
+  {
+    id: 'chunk-book-1-1',
+    documentId: 'doc-book',
+    sectionId: 'book-1-1',
+    parentId: null,
+    prevId: null,
+    nextId: null,
+    kind: 'definition',
+    text: 'The average velocity is the displacement divided by the elapsed time: v_avg = Δx / Δt.',
+    contextHeader: 'University Physics > 2.1 Displacement > 2.1.2 Average velocity',
+    page: 13,
+    tokenCount: 20,
+    quality: 0.98,
+  },
+  {
+    id: 'chunk-book-3',
+    documentId: 'doc-book',
+    sectionId: 'book-3',
+    parentId: null,
+    prevId: null,
+    nextId: null,
+    kind: 'formula',
+    text: 'Near the surface of the Earth, all objects fall with the same constant acceleration g ≈ 9.8 m/s², neglecting air resistance.',
+    contextHeader: 'University Physics > 2.5 Free fall',
+    page: 24,
+    tokenCount: 24,
+    quality: 0.97,
+  },
+  {
+    id: 'chunk-slides-1-1',
+    documentId: 'doc-slides',
+    sectionId: 'slides-1-1',
+    parentId: null,
+    prevId: null,
+    nextId: null,
+    kind: 'definition',
+    text: 'Average velocity = total displacement / total time. Instantaneous velocity is the limit as the time interval shrinks to zero.',
+    contextHeader: 'Week 3 slides > Average vs instantaneous velocity',
+    page: 4,
+    tokenCount: 26,
+    quality: 0.9,
+  },
+  {
+    id: 'chunk-slides-2',
+    documentId: 'doc-slides',
+    sectionId: 'slides-2',
+    parentId: null,
+    prevId: null,
+    nextId: null,
+    kind: 'text',
+    text: 'Free fall uses g = 10 m/s² to keep the arithmetic tidy for exams.',
+    contextHeader: 'Week 3 slides > Acceleration and free fall',
+    page: 6,
+    tokenCount: 16,
+    quality: 0.92,
+  },
+  {
+    id: 'chunk-slides-3',
+    documentId: 'doc-slides',
+    sectionId: 'slides-3',
+    parentId: null,
+    prevId: null,
+    nextId: null,
+    kind: 'text',
+    text: 'In this course we adopt the convention that upward is the positive direction.',
+    contextHeader: 'Week 3 slides > Sign conventions',
+    page: 9,
+    tokenCount: 15,
+    quality: 0.95,
+  },
+  {
+    id: 'chunk-notes-1',
+    documentId: 'doc-notes',
+    sectionId: 'notes-1',
+    parentId: null,
+    prevId: null,
+    nextId: null,
+    kind: 'example',
+    text: 'A ball is dropped from 20 m. Using g = 10 m/s² it lands after t = 2 s.',
+    contextHeader: 'Lecture notes > Worked example — dropped ball',
+    page: 1,
+    tokenCount: 20,
+    quality: 0.88,
+  },
+];
+
+export const mockEdges: Edge[] = [
+  {
+    id: 'edge-1',
+    courseId: COURSE_ID,
+    profUnitId: 'slides-1-1',
+    bookSectionId: 'book-1-1',
+    relation: 'same',
+    confidence: 0.91,
+    rationale: 'Both define average velocity as displacement over elapsed time.',
+    status: 'confirmed',
+  },
+  {
+    id: 'edge-2',
+    courseId: COURSE_ID,
+    profUnitId: 'slides-2',
+    bookSectionId: 'book-3',
+    relation: 'conflicts',
+    confidence: 0.72,
+    rationale: 'Slides use g = 10 m/s² for exams; the book uses g = 9.8 m/s². Flagged for review.',
+    status: 'proposed',
+  },
+  {
+    id: 'edge-3',
+    courseId: COURSE_ID,
+    profUnitId: 'slides-3',
+    bookSectionId: null,
+    relation: 'professor_only',
+    confidence: 0.4,
+    rationale: 'No book section covers the course sign convention.',
+    status: 'proposed',
+  },
+  {
+    id: 'edge-4',
+    courseId: COURSE_ID,
+    profUnitId: 'notes-1',
+    bookSectionId: 'book-3',
+    relation: 'extends',
+    confidence: 0.66,
+    rationale: 'Worked example applies the free-fall equations from the book.',
+    status: 'remapped',
+  },
+];
+
+/** A deterministic progress stream the SSE client simulates in mock mode. */
+export function mockJobProgress(jobId: string, kind: JobKind): JobProgress[] {
+  return [
+    { jobId, kind, status: 'queued', progress: 0, message: 'Queued' },
+    { jobId, kind, status: 'running', progress: 0.35, message: 'Extracting text' },
+    { jobId, kind, status: 'running', progress: 0.7, message: 'Detecting structure' },
+    { jobId, kind, status: 'running', progress: 1, message: 'Done' },
+    { jobId, kind, status: 'done', progress: 1, message: 'Complete' },
+  ];
+}
