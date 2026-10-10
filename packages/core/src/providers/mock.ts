@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { EmbeddingProvider, LLMProvider, LLMRequest, LLMResponse } from './llm';
+import type { EmbeddingProvider, LLMProvider, LLMRequest, LLMResponse, VisionRequest } from './llm';
 
 export function hashPrompt(req: LLMRequest): string {
   const h = createHash('sha256');
@@ -24,6 +24,23 @@ export class MockProvider implements LLMProvider {
   when(req: LLMRequest, text: string): this {
     this.fixed.set(hashPrompt(req), text);
     return this;
+  }
+
+  private readonly fixedVision = new Map<string, string>();
+
+  /** Register a fixed vision transcript for an image (matched by content hash). */
+  whenImage(image: Uint8Array, text: string): this {
+    this.fixedVision.set(createHash('sha256').update(image).digest('hex'), text);
+    return this;
+  }
+
+  async vision(req: VisionRequest): Promise<LLMResponse> {
+    const key = createHash('sha256').update(req.image).digest('hex');
+    const text = this.fixedVision.get(key) ?? `[mock-vision:${key.slice(0, 12)}]`;
+    return {
+      text,
+      usage: { inputTokens: approxTokens(req.prompt) + 85, outputTokens: approxTokens(text) },
+    };
   }
 
   async complete(req: LLMRequest): Promise<LLMResponse> {

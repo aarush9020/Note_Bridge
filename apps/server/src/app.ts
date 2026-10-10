@@ -9,12 +9,20 @@ import {
   type PluginContext,
 } from '@gyan/core';
 import { openDb, type Db } from './db';
+import { DocumentRepository } from './db/repositories/documents';
+import { IngestStore } from './db/repositories/ingest-store';
+import { JobRepository } from './db/repositories/jobs';
+import { JobRunner, ProgressBus } from './jobs';
 import { loadPlugins, type LoadedPlugin, type PluginImporter } from './plugins/loader';
+import { registerIngestRoutes } from './routes/ingest';
 
 export interface BuiltApp {
   app: FastifyInstance;
   db: Db;
   plugins: LoadedPlugin[];
+  runner: JobRunner;
+  documents: DocumentRepository;
+  store: IngestStore;
 }
 
 export interface BuildOptions {
@@ -41,6 +49,19 @@ export async function buildApp({ config, importer }: BuildOptions): Promise<Buil
 
   const plugins = await loadPlugins(app, ctx, config.plugins, importer);
 
+  // Ingestion: a job left running by a crash can never finish, so fail it on startup.
+  const documents = new DocumentRepository(db);
+  const store = new IngestStore(db);
+  const jobs = new JobRepository(db);
+  jobs.failInterrupted();
+  const bus = new ProgressBus();
+  const runner = new JobRunner(jobs, bus);
+  await registerIngestRoutes(app, {
+    ingest: { documents, store, runner, llm: ctx.llm, embeddings: ctx.embeddings },
+    bus,
+    jobs,
+  });
+
   app.get('/api/health', async () => ({
     ok: true,
     llmProvider: ctx.llm.id,
@@ -51,5 +72,5 @@ export async function buildApp({ config, importer }: BuildOptions): Promise<Buil
   // Redacted view of effective config, handy for the Settings page.
   app.get('/api/config', async () => redactConfig(config));
 
-  return { app, db, plugins };
+  return { app, db, plugins, runner, documents, store };
 }

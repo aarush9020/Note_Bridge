@@ -12,9 +12,11 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "pdfjs-dist": "^6.4.299",
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0"
+    "@types/node": "^24.0.0",
+    "pdf-lib": "^1.17.1"
   }
 }

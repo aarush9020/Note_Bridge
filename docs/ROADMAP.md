@@ -2,21 +2,21 @@
 
 Status key: done / in progress / planned / cut (with reason).
 
-| Phase | Scope                                                                   | Owner | Status  |
-| ----- | ----------------------------------------------------------------------- | ----- | ------- |
-| 0     | Scaffold, contracts, migration, MockProvider, server + web skeleton, CI | both  | done    |
-| 1a    | Ingestion: PDF extraction, quality gate, offsets, structure, chunker    | A     | planned |
-| 1b    | Retrieval, alignment, grounding (backend)                               | A     | planned |
-| 1b    | Screens: Courses, Upload, Alignment Map, Viewer, Coverage               | B     | planned |
-| 1c    | Eval harness, `docs/EVAL.md`, synthetic physics sample, `pnpm seed`     | A     | planned |
-| 2     | Study Agent (`@cline/sdk`, falls back to MockAgent)                     | B     | planned |
-| 3     | Verifier (sandbox)                                                      | A     | planned |
-| 4     | Conflicts                                                               | A     | planned |
-| 5     | Problem Finder                                                          | B     | planned |
-| 6     | Handwriting Repair                                                      | B     | planned |
-| 7     | Prerequisites                                                           | B     | planned |
-| 8     | Semester Tracker, Mistake Diagnosis                                     | B     | planned |
-| 9     | Stretch features, only if time remains                                  | -     | planned |
+| Phase | Scope                                                                   | Owner | Status                                                                                                                   |
+| ----- | ----------------------------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------ |
+| 0     | Scaffold, contracts, migration, MockProvider, server + web skeleton, CI | both  | done                                                                                                                     |
+| 1a    | Ingestion: PDF extraction, quality gate, offsets, structure, chunker    | A     | in progress: pipeline, jobs, upload and SSE routes done; real providers, local embeddings and page rendering still to do |
+| 1b    | Retrieval, alignment, grounding (backend)                               | A     | planned                                                                                                                  |
+| 1b    | Screens: Courses, Upload, Alignment Map, Viewer, Coverage               | B     | planned                                                                                                                  |
+| 1c    | Eval harness, `docs/EVAL.md`, synthetic physics sample, `pnpm seed`     | A     | planned                                                                                                                  |
+| 2     | Study Agent (`@cline/sdk`, falls back to MockAgent)                     | B     | planned                                                                                                                  |
+| 3     | Verifier (sandbox)                                                      | A     | planned                                                                                                                  |
+| 4     | Conflicts                                                               | A     | planned                                                                                                                  |
+| 5     | Problem Finder                                                          | B     | planned                                                                                                                  |
+| 6     | Handwriting Repair                                                      | B     | planned                                                                                                                  |
+| 7     | Prerequisites                                                           | B     | planned                                                                                                                  |
+| 8     | Semester Tracker, Mistake Diagnosis                                     | B     | planned                                                                                                                  |
+| 9     | Stretch features, only if time remains                                  | -     | planned                                                                                                                  |
 
 ## Cuts
 
